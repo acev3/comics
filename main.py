@@ -27,8 +27,7 @@ def get_xckd_image(comics_id=1, correct_folder="comics"):
     author_comments = decoded_response["alt"]
     os.makedirs(correct_folder, exist_ok=True)
     filepath = os.path.join(correct_folder, title)
-    filename = save_image(image_url, filepath)
-    return title, author_comments, filename
+    return title, author_comments, image_url, filepath
 
 
 def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
@@ -118,7 +117,8 @@ def main():
     vk_api_version = os.environ["VK_API_VERSION"]
     last_comics_number = get_last_comics_number()
     comics_id = random.randint(1, int(last_comics_number))
-    title, author_comments, filename = get_xckd_image(comics_id=comics_id)
+    title, author_comments, image_url, filepath = get_xckd_image(comics_id=comics_id)
+    filename = save_image(image_url, filepath)
     message = "{}.{}".format(title, author_comments)
     try:
         upload_url = get_upload_server(vk_access_token, vk_group_id, vk_api_version)
