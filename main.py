@@ -21,9 +21,10 @@ def get_xckd_image(comics_id=1, correct_folder="images"):
     url = "http://xkcd.com/{}/info.0.json".format(comics_id)
     response = requests.get(url, verify=False)
     response.raise_for_status()
-    image_url = response.json()["img"]
-    title = response.json()["title"]
-    alt = response.json()["alt"]
+    decoded_response = response.json()
+    image_url = decoded_response["img"]
+    title = decoded_response["title"]
+    alt = decoded_response["alt"]
     if not os.path.exists(correct_folder):
         os.mkdir(correct_folder)
     filepath = os.path.join(correct_folder, title)
@@ -59,9 +60,10 @@ def upload_to_server(vk_access_token, vk_group_id, vk_api_version, filename):
         }
         response = requests.post(upload_url, files=files)
         response.raise_for_status()
-    server = response.json()["server"]
-    photo = response.json()["photo"]
-    hash_answer = response.json()["hash"]
+    decoded_response = response.json()
+    server = decoded_response["server"]
+    photo = decoded_response["photo"]
+    hash_answer = decoded_response["hash"]
     return server, photo, hash_answer
 
 
@@ -83,8 +85,9 @@ def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
                 )
     response = requests.post(url, verify=False)
     response.raise_for_status()
-    media_id = response.json()["response"][0]["id"]
-    owner_id = response.json()["response"][0]["owner_id"]
+    decoded_response = response.json()
+    media_id = decoded_response["response"][0]["id"]
+    owner_id = decoded_response["response"][0]["owner_id"]
     return media_id, owner_id
 
 
