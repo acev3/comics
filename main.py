@@ -17,7 +17,7 @@ def save_image(url, filepath):
     return filename
 
 
-def get_xckd_image(comics_id=1, correct_folder="images"):
+def get_xckd_image(comics_id=1, correct_folder="comics"):
     url = "http://xkcd.com/{}/info.0.json".format(comics_id)
     response = requests.get(url, verify=False)
     response.raise_for_status()
