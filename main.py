@@ -34,15 +34,13 @@ def get_xckd_image(comics_id=1, correct_folder="comics"):
 def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
                       method_name="photos.getWallUploadServer"
                       ):
-    params = "group_id={}".format(vk_group_id)
-    access_token = vk_access_token
-    url = "https://api.vk.com/method/{}?{}&access_token={}&v={}"\
-        .format(method_name,
-                params,
-                access_token,
-                vk_api_version
-                )
-    response = requests.get(url, verify=False)
+    payload = {"group_id": vk_group_id,
+               "access_token": vk_access_token,
+               "v": vk_api_version
+               }
+    vk_access_token
+    url = "https://api.vk.com/method/{}".format(method_name)
+    response = requests.get(url, params=payload, verify=False)
     response.raise_for_status()
     upload_url = response.json()["response"]["upload_url"]
     return upload_url
@@ -72,17 +70,15 @@ def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
     server, photo, hash_answer = upload_to_server(vk_access_token, vk_group_id,
                                                   vk_api_version, filename
                                                   )
-    params = "group_id={}&server={}&photo={}&hash={}"\
-        .format(vk_group_id, server,
-                photo, hash_answer
-                )
-    url = "https://api.vk.com/method/{}?{}&access_token={}&v={}"\
-        .format(method_name,
-                params,
-                vk_access_token,
-                vk_api_version
-                )
-    response = requests.post(url, verify=False)
+    payload = {"group_id": vk_group_id,
+               "server": server,
+               "photo": photo,
+               "hash": hash_answer,
+               "access_token": vk_access_token,
+               "v": vk_api_version
+               }
+    url = "https://api.vk.com/method/{}".format(method_name)
+    response = requests.post(url, params=payload, verify=False)
     response.raise_for_status()
     decoded_response = response.json()
     media_id = decoded_response["response"][0]["id"]
@@ -98,17 +94,16 @@ def publication_post(vk_access_token, vk_group_id, vk_api_version,
                                               vk_api_version, filename
                                               )
     attachments = "photo{}_{}".format(owner_id, media_id)
-    params = "owner_id=-{}&from_group={}&attachments={}&message={}"\
-        .format(vk_group_id,
-                group_publication_tag, attachments, message
-                )
-    url = "https://api.vk.com/method/{}?{}&access_token={}&v={}"\
-        .format(method_name,
-                params,
-                vk_access_token,
-                vk_api_version
-                )
-    response = requests.post(url, verify=False)
+    owner_id = "-{}".format(vk_group_id)
+    payload = {"owner_id": owner_id,
+               "from_group": group_publication_tag,
+               "attachments": attachments,
+               "message": message,
+               "access_token": vk_access_token,
+               "v": vk_api_version
+               }
+    url = "https://api.vk.com/method/{}".format(method_name)
+    response = requests.post(url, params=payload, verify=False)
     response.raise_for_status()
 
 
