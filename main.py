@@ -31,16 +31,16 @@ def get_xckd_image(comics_id=1, correct_folder="images"):
     return title, alt, filename
 
 
-def get_upload_server(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
+def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
                       method_name="photos.getWallUploadServer"
                       ):
-    params = "group_id={}".format(VK_GROUP_ID)
-    access_token = VK_ACCESS_TOKEN
+    params = "group_id={}".format(vk_group_id)
+    access_token = vk_access_token
     url = "https://api.vk.com/method/{}?{}&access_token={}&v={}"\
         .format(method_name,
                 params,
                 access_token,
-                VK_API_VERSION
+                vk_api_version
                 )
     response = requests.get(url, verify=False)
     response.raise_for_status()
@@ -48,9 +48,9 @@ def get_upload_server(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
     return upload_url
 
 
-def upload_to_server(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION, filename):
-    upload_url = get_upload_server(VK_ACCESS_TOKEN,
-                                   VK_GROUP_ID, VK_API_VERSION
+def upload_to_server(vk_access_token, vk_group_id, vk_api_version, filename):
+    upload_url = get_upload_server(vk_access_token,
+                                   vk_group_id, vk_api_version
                                    )
     with open(filename, "rb") as file:
 
@@ -65,21 +65,21 @@ def upload_to_server(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION, filename):
     return server, photo, hash_answer
 
 
-def save_image_on_server(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
+def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
                          filename, method_name="photos.saveWallPhoto"
                          ):
-    server, photo, hash_answer = upload_to_server(VK_ACCESS_TOKEN, VK_GROUP_ID,
-                                                  VK_API_VERSION, filename
+    server, photo, hash_answer = upload_to_server(vk_access_token, vk_group_id,
+                                                  vk_api_version, filename
                                                   )
     params = "group_id={}&server={}&photo={}&hash={}"\
-        .format(VK_GROUP_ID, server,
+        .format(vk_group_id, server,
                 photo, hash_answer
                 )
     url = "https://api.vk.com/method/{}?{}&access_token={}&v={}"\
         .format(method_name,
                 params,
-                VK_ACCESS_TOKEN,
-                VK_API_VERSION
+                vk_access_token,
+                vk_api_version
                 )
     response = requests.post(url, verify=False)
     response.raise_for_status()
@@ -88,23 +88,23 @@ def save_image_on_server(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
     return media_id, owner_id
 
 
-def publication_post(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
+def publication_post(vk_access_token, vk_group_id, vk_api_version,
                      message, filename, method_name="wall.post"
                      ):
     group_publication_tag = 1
-    media_id, owner_id = save_image_on_server(VK_ACCESS_TOKEN, VK_GROUP_ID,
-                                              VK_API_VERSION, filename
+    media_id, owner_id = save_image_on_server(vk_access_token, vk_group_id,
+                                              vk_api_version, filename
                                               )
     attachments = "photo{}_{}".format(owner_id, media_id)
     params = "owner_id=-{}&from_group={}&attachments={}&message={}"\
-        .format(VK_GROUP_ID,
+        .format(vk_group_id,
                 group_publication_tag, attachments, message
                 )
     url = "https://api.vk.com/method/{}?{}&access_token={}&v={}"\
         .format(method_name,
                 params,
-                VK_ACCESS_TOKEN,
-                VK_API_VERSION
+                vk_access_token,
+                vk_api_version
                 )
     response = requests.post(url, verify=False)
     response.raise_for_status()
@@ -112,14 +112,14 @@ def publication_post(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
 
 def main():
     load_dotenv()
-    VK_ACCESS_TOKEN = os.environ["VK_ACCESS_TOKEN"]
-    VK_GROUP_ID = os.environ["VK_GROUP_ID"]
-    VK_API_VERSION = os.environ["VK_API_VERSION"]
+    vk_access_token = os.environ["VK_ACCESS_TOKEN"]
+    vk_group_id = os.environ["VK_GROUP_ID"]
+    vk_api_version = os.environ["VK_API_VERSION"]
     last_comics_number = get_last_comics_number()
     comics_id = random.randint(1, int(last_comics_number))
     title, alt, filename = get_xckd_image(comics_id=comics_id)
     message = title + alt
-    publication_post(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
+    publication_post(vk_access_token, vk_group_id, vk_api_version,
                      message, filename
                      )
     os.remove(filename)
