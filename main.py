@@ -110,6 +110,13 @@ def publication_post(vk_access_token, vk_group_id, vk_api_version,
     response.raise_for_status()
 
 
+def get_last_comics_number(url="http://xkcd.com/info.0.json"):
+    response = requests.get(url, verify=False)
+    response.raise_for_status()
+    last_comics_number = response.json()['num']
+    return last_comics_number
+
+
 def main():
     load_dotenv()
     vk_access_token = os.environ["VK_ACCESS_TOKEN"]
@@ -123,13 +130,6 @@ def main():
                      message, filename
                      )
     os.remove(filename)
-
-def get_last_comics_number(url="http://xkcd.com/info.0.json"):
-    response = requests.get(url, verify=False)
-    response.raise_for_status()
-    last_comics_number = response.json()['num']
-    return last_comics_number
-
 
 
 if __name__ == '__main__':
