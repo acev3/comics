@@ -42,8 +42,7 @@ def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
     url = "https://api.vk.com/method/{}".format(method_name)
     response = requests.get(url, params=payload, verify=False)
     decoded_response = response.json()
-    if 'error' in decoded_response:
-        raise requests.exceptions.HTTPError(decoded_response['error'])
+    vk_api_raise_for_status(decoded_response)
     upload_url = decoded_response["response"]["upload_url"]
     return upload_url
 
@@ -59,8 +58,7 @@ def upload_to_server(vk_access_token, vk_group_id, vk_api_version, filename):
         }
         response = requests.post(upload_url, files=files)
         decoded_response = response.json()
-        if 'error' in decoded_response:
-            raise requests.exceptions.HTTPError(decoded_response['error'])
+        vk_api_raise_for_status(decoded_response)
     server = decoded_response["server"]
     photo = decoded_response["photo"]
     hash_answer = decoded_response["hash"]
@@ -83,8 +81,7 @@ def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
     url = "https://api.vk.com/method/{}".format(method_name)
     response = requests.post(url, params=payload, verify=False)
     decoded_response = response.json()
-    if 'error' in decoded_response:
-        raise requests.exceptions.HTTPError(decoded_response['error'])
+    vk_api_raise_for_status(decoded_response)
     media_id = decoded_response["response"][0]["id"]
     owner_id = decoded_response["response"][0]["owner_id"]
     return media_id, owner_id
@@ -109,8 +106,7 @@ def publication_post(vk_access_token, vk_group_id, vk_api_version,
     url = "https://api.vk.com/method/{}".format(method_name)
     response = requests.post(url, params=payload, verify=False)
     decoded_response = response.json()
-    if 'error' in decoded_response:
-        raise requests.exceptions.HTTPError(decoded_response['error'])
+    vk_api_raise_for_status(decoded_response)
 
 
 def get_last_comics_number(url="http://xkcd.com/info.0.json"):
@@ -118,6 +114,11 @@ def get_last_comics_number(url="http://xkcd.com/info.0.json"):
     response.raise_for_status()
     last_comics_number = response.json()['num']
     return last_comics_number
+
+
+def vk_api_raise_for_status(decoded_response):
+    if 'error' in decoded_response:
+        raise requests.exceptions.HTTPError(decoded_response['error'])
 
 
 def main():
