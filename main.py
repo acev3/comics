@@ -41,8 +41,10 @@ def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
     vk_access_token
     url = "https://api.vk.com/method/{}".format(method_name)
     response = requests.get(url, params=payload, verify=False)
-    response.raise_for_status()
-    upload_url = response.json()["response"]["upload_url"]
+    decoded_response = response.json()
+    if 'error' in decoded_response:
+        raise requests.exceptions.HTTPError(decoded_response['error'])
+    upload_url = decoded_response["response"]["upload_url"]
     return upload_url
 
 
@@ -56,8 +58,9 @@ def upload_to_server(vk_access_token, vk_group_id, vk_api_version, filename):
             "photo": file,
         }
         response = requests.post(upload_url, files=files)
-        response.raise_for_status()
-    decoded_response = response.json()
+        decoded_response = response.json()
+        if 'error' in decoded_response:
+            raise requests.exceptions.HTTPError(decoded_response['error'])
     server = decoded_response["server"]
     photo = decoded_response["photo"]
     hash_answer = decoded_response["hash"]
@@ -79,8 +82,9 @@ def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
                }
     url = "https://api.vk.com/method/{}".format(method_name)
     response = requests.post(url, params=payload, verify=False)
-    response.raise_for_status()
     decoded_response = response.json()
+    if 'error' in decoded_response:
+        raise requests.exceptions.HTTPError(decoded_response['error'])
     media_id = decoded_response["response"][0]["id"]
     owner_id = decoded_response["response"][0]["owner_id"]
     return media_id, owner_id
@@ -104,7 +108,9 @@ def publication_post(vk_access_token, vk_group_id, vk_api_version,
                }
     url = "https://api.vk.com/method/{}".format(method_name)
     response = requests.post(url, params=payload, verify=False)
-    response.raise_for_status()
+    decoded_response = response.json()
+    if 'error' in decoded_response:
+        raise requests.exceptions.HTTPError(decoded_response['error'])
 
 
 def get_last_comics_number(url="http://xkcd.com/info.0.json"):
@@ -123,10 +129,12 @@ def main():
     comics_id = random.randint(1, int(last_comics_number))
     title, alternative_text, filename = get_xckd_image(comics_id=comics_id)
     message = title + alternative_text
-    publication_post(vk_access_token, vk_group_id, vk_api_version,
-                     message, filename
-                     )
-    os.remove(filename)
+    try:
+        publication_post(vk_access_token, vk_group_id, vk_api_version,
+                         message, filename
+                         )
+    finally:
+        os.remove(filename)
 
 
 if __name__ == '__main__':
