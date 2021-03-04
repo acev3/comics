@@ -128,7 +128,7 @@ def main():
     last_comics_number = get_last_comics_number()
     comics_id = random.randint(1, int(last_comics_number))
     title, alternative_text, filename = get_xckd_image(comics_id=comics_id)
-    message = title + alternative_text
+    message = "{}.{}".format(title, alternative_text)
     try:
         publication_post(vk_access_token, vk_group_id, vk_api_version,
                          message, filename
