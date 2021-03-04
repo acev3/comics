@@ -61,7 +61,8 @@ def upload_to_server(filename, upload_url):
 
 
 def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
-                         server, photo, hash_answer,  method_name="photos.saveWallPhoto"
+                         server, photo, hash_answer,
+                         method_name="photos.saveWallPhoto"
                          ):
     payload = {"group_id": vk_group_id,
                "server": server,
@@ -117,14 +118,19 @@ def main():
     vk_api_version = os.environ["VK_API_VERSION"]
     last_comics_number = get_last_comics_number()
     comics_id = random.randint(1, int(last_comics_number))
-    title, author_comments, image_url, filepath = get_xckd_image(comics_id=comics_id)
+    title, author_comments, image_url, filepath = get_xckd_image(
+            comics_id=comics_id)
     filename = save_image(image_url, filepath)
     message = "{}.{}".format(title, author_comments)
     try:
-        upload_url = get_upload_server(vk_access_token, vk_group_id, vk_api_version)
+        upload_url = get_upload_server(vk_access_token, vk_group_id,
+                                       vk_api_version
+                                       )
         server, photo, hash_answer = upload_to_server(filename, upload_url)
-        media_id, owner_id = save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
-                             server, photo, hash_answer,)
+        media_id, owner_id = save_image_on_server(vk_access_token,
+                                                  vk_group_id, vk_api_version,
+                                                  server, photo, hash_answer
+                                                  )
         publication_post(vk_access_token, vk_group_id, vk_api_version,
                          message, media_id, owner_id
                          )
