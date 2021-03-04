@@ -24,11 +24,11 @@ def get_xckd_image(comics_id=1, correct_folder="comics"):
     decoded_response = response.json()
     image_url = decoded_response["img"]
     title = decoded_response["title"]
-    alt = decoded_response["alt"]
+    alternative_text = decoded_response["alt"]
     os.makedirs(correct_folder, exist_ok=True)
     filepath = os.path.join(correct_folder, title)
     filename = save_image(image_url, filepath)
-    return title, alt, filename
+    return title, alternative_text, filename
 
 
 def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
@@ -126,8 +126,8 @@ def main():
     vk_api_version = os.environ["VK_API_VERSION"]
     last_comics_number = get_last_comics_number()
     comics_id = random.randint(1, int(last_comics_number))
-    title, alt, filename = get_xckd_image(comics_id=comics_id)
-    message = title + alt
+    title, alternative_text, filename = get_xckd_image(comics_id=comics_id)
+    message = title + alternative_text
     publication_post(vk_access_token, vk_group_id, vk_api_version,
                      message, filename
                      )
