@@ -115,14 +115,21 @@ def main():
     VK_ACCESS_TOKEN = os.environ["VK_ACCESS_TOKEN"]
     VK_GROUP_ID = os.environ["VK_GROUP_ID"]
     VK_API_VERSION = os.environ["VK_API_VERSION"]
-    LAST_COMICS_NUMBER = os.environ["LAST_COMICS_NUMBER"]
-    comics_id = random.randint(1, int(LAST_COMICS_NUMBER))
+    last_comics_number = get_last_comics_number()
+    comics_id = random.randint(1, int(last_comics_number))
     title, alt, filename = get_xckd_image(comics_id=comics_id)
     message = title + alt
     publication_post(VK_ACCESS_TOKEN, VK_GROUP_ID, VK_API_VERSION,
                      message, filename
                      )
     os.remove(filename)
+
+def get_last_comics_number(url="http://xkcd.com/info.0.json"):
+    response = requests.get(url, verify=False)
+    response.raise_for_status()
+    last_comics_number = response.json()['num']
+    return last_comics_number
+
 
 
 if __name__ == '__main__':
