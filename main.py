@@ -38,7 +38,6 @@ def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
                "access_token": vk_access_token,
                "v": vk_api_version
                }
-    vk_access_token
     url = "https://api.vk.com/method/{}".format(method_name)
     response = requests.get(url, params=payload, verify=False)
     decoded_response = response.json()
@@ -47,10 +46,7 @@ def get_upload_server(vk_access_token, vk_group_id, vk_api_version,
     return upload_url
 
 
-def upload_to_server(vk_access_token, vk_group_id, vk_api_version, filename):
-    upload_url = get_upload_server(vk_access_token,
-                                   vk_group_id, vk_api_version
-                                   )
+def upload_to_server(filename, upload_url):
     with open(filename, "rb") as file:
 
         files = {
@@ -66,11 +62,8 @@ def upload_to_server(vk_access_token, vk_group_id, vk_api_version, filename):
 
 
 def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
-                         filename, method_name="photos.saveWallPhoto"
+                         server, photo, hash_answer,  method_name="photos.saveWallPhoto"
                          ):
-    server, photo, hash_answer = upload_to_server(vk_access_token, vk_group_id,
-                                                  vk_api_version, filename
-                                                  )
     payload = {"group_id": vk_group_id,
                "server": server,
                "photo": photo,
@@ -88,12 +81,9 @@ def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
 
 
 def publication_post(vk_access_token, vk_group_id, vk_api_version,
-                     message, filename, method_name="wall.post"
+                     message, media_id, owner_id, method_name="wall.post"
                      ):
     group_publication_tag = 1
-    media_id, owner_id = save_image_on_server(vk_access_token, vk_group_id,
-                                              vk_api_version, filename
-                                              )
     attachments = "photo{}_{}".format(owner_id, media_id)
     owner_id = "-{}".format(vk_group_id)
     payload = {"owner_id": owner_id,
@@ -131,8 +121,12 @@ def main():
     title, alternative_text, filename = get_xckd_image(comics_id=comics_id)
     message = "{}.{}".format(title, alternative_text)
     try:
+        upload_url = get_upload_server(vk_access_token, vk_group_id, vk_api_version)
+        server, photo, hash_answer = upload_to_server(filename, upload_url)
+        media_id, owner_id = save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
+                             server, photo, hash_answer,)
         publication_post(vk_access_token, vk_group_id, vk_api_version,
-                         message, filename
+                         message, media_id, owner_id
                          )
     finally:
         os.remove(filename)
