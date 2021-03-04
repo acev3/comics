@@ -25,8 +25,7 @@ def get_xckd_image(comics_id=1, correct_folder="comics"):
     image_url = decoded_response["img"]
     title = decoded_response["title"]
     alt = decoded_response["alt"]
-    if not os.path.exists(correct_folder):
-        os.mkdir(correct_folder)
+    os.makedirs(correct_folder, exist_ok=True)
     filepath = os.path.join(correct_folder, title)
     filename = save_image(image_url, filepath)
     return title, alt, filename
