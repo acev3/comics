@@ -80,9 +80,9 @@ def save_image_on_server(vk_access_token, vk_group_id, vk_api_version,
     return media_id, owner_id
 
 
-def publication_post(vk_access_token, vk_group_id, vk_api_version,
-                     message, media_id, owner_id, method_name="wall.post"
-                     ):
+def publish_post(vk_access_token, vk_group_id, vk_api_version,
+                 message, media_id, owner_id, method_name="wall.post"
+                 ):
     group_publication_tag = 1
     attachments = "photo{}_{}".format(owner_id, media_id)
     owner_id = "-{}".format(vk_group_id)
@@ -131,9 +131,9 @@ def main():
                                                   vk_group_id, vk_api_version,
                                                   server, photo, hash_answer
                                                   )
-        publication_post(vk_access_token, vk_group_id, vk_api_version,
-                         message, media_id, owner_id
-                         )
+        publish_post(vk_access_token, vk_group_id, vk_api_version,
+                     message, media_id, owner_id
+                     )
     finally:
         os.remove(filename)
 
